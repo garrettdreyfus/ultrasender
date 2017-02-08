@@ -1,30 +1,28 @@
-#include <elapsedMillis.h>
-
-elapsedMillis timeElapsed;
+#include <TimerOne.h>
 const int pingPin = 7;
-
 void setup() {
-  // initialize serial communication:
+  
   Serial.begin(9600);
+    Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
+  Timer1.attachInterrupt(recAndStore);
 }
 const int len=8;
 int bytestring[len];
-unsigned int interval = 250;
+
+int i = 0;
+bool flip = false;
 void loop()
 {
-  int counter = 0;
-  int total = 0;
-  long duration, inches, cm;
-  for(int i=0;i<len;i++){
-    timeElapsed=0;
-    while(timeElapsed < interval){
-    }
-    bytestring[i] = rec();
-    Serial.print(bytestring[i]);
-    
+  if(i==7){
+    flip=true;
   }
-  Serial.print("\n");
-  
+  if(i==0 && flip){
+    for(int j=0;j<len;j++){
+      Serial.print(bytestring[j]);
+    }
+    Serial.print("\n");
+    flip = false;
+  }
 }
 
 long microsecondsToInches(long microseconds)
@@ -36,8 +34,25 @@ long microsecondsToCentimeters(long microseconds)
 {
    return microseconds / 29 / 2;
 }
+int counter = 0;
+int sum =0;
+void recAndStore(){
+  sum += rec();
+  if(counter ==2){
+    if(sum>0){
+      bytestring[i] = true;
+    }
+    else{
+      bytestring[i] = false;
+    }
+    i = (i+1)%len;
+    counter=0;
+    sum=0;
+  }
+  counter ++;
+}
 
-bool rec(){
+int rec(){
       pinMode(pingPin, OUTPUT);
     digitalWrite(pingPin, LOW);
     delayMicroseconds(2);
@@ -49,10 +64,10 @@ bool rec(){
     duration = pulseIn(pingPin, HIGH);
   
     if(microsecondsToCentimeters(duration) <330 ){
-      return true;
+      return 1;
     }
     else {
-      return false;
+      return 0;
     }
 }
 
