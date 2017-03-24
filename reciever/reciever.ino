@@ -3,7 +3,7 @@ const int pingPin = 7;
 void setup() {
   
   Serial.begin(9600);
-    Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
+    Timer1.initialize(125000);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(recAndStore);
 }
 const int len=8;
@@ -38,7 +38,7 @@ int counter = 0;
 int sum =0;
 void recAndStore(){
   sum += rec();
-  if(counter ==2){
+  if(counter ==4){
     if(sum>0){
       bytestring[i] = true;
     }
