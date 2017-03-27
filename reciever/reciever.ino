@@ -6,14 +6,14 @@ void setup() {
     Timer1.initialize(125000);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(recAndStore);
 }
-const int len=8;
+const int len=16;
 int bytestring[len];
 
 int i = 0;
 bool flip = false;
 void loop()
 {
-  if(i==7){
+  if(i==len-1){
     flip=true;
   }
   if(i==0 && flip){
