@@ -1,13 +1,24 @@
 #include <TimerOne.h>
 const int pingPin = 7;
+const float encodingMatrix[4][8] =
+  {
+    {1,1,1,0,0,0,0,0},
+    {0,0,0,1,1,0,0,0},
+    {1,1,0,1,0,1,0,0},
+    {0,1,0,1,0,1,1,0}
+  }
+float decodingMatrix[8][4];
+Matrix.Transpose((float *)encodingMatrix,4,8,(float *)decodingMatrix);
+
 void setup() {
   
   Serial.begin(9600);
     Timer1.initialize(125000);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(recAndStore);
 }
-const int len=16;
+const int len=8;
 int bytestring[len];
+float finalstring[len];
 
 int i = 0;
 bool flip = false;
@@ -17,10 +28,11 @@ void loop()
     flip=true;
   }
   if(i==0 && flip){
-    for(int j=0;j<len;j++){
-      Serial.print(bytestring[j]);
+    Matrix.Multiply((float *)bytestring, (float *) decodingMatrix,1,4,8,(float *)finalstring);
+    for(int i=0;i<8;i++){
+      Serial.print(finalstring[i]);
     }
-    Serial.print("\n");
+      Serial.print("\n");
     flip = false;
   }
 }
