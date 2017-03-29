@@ -6,7 +6,18 @@ const float encodingMatrix[4][8] =
     {0,0,0,1,1,0,0,0},
     {1,1,0,1,0,1,0,0},
     {0,1,0,1,0,1,1,0}
-  }
+  };
+const float checkMatrix[8][3] =
+  {
+    {1,0,0},
+    {0,1,0},
+    {1,1,0},
+    {0,0,1},
+    {1,0,1},
+    {0,1,1},
+    {0,1,1},
+    {0,0,0},
+  };
 float decodingMatrix[8][4];
 Matrix.Transpose((float *)encodingMatrix,4,8,(float *)decodingMatrix);
 
@@ -19,9 +30,20 @@ void setup() {
 const int len=8;
 int bytestring[len];
 float finalstring[len];
+float checkstring[3];
 
 int i = 0;
 bool flip = false;
+void hammingCorrect(){
+    Matrix.Multiply((float *)bytestring, (float *) checkMatrix,1,8,3,(float *)checkstring);
+    int errorindex=0;
+    for(int i=0;i<3;i++){
+      if(checkstring[i] == 1){
+        errorindex += pow(2,i);
+      }
+    }
+    bytestring[errorindex] = (bytestring[errorindex]+1)%2;
+}
 void loop()
 {
   if(i==len-1){
