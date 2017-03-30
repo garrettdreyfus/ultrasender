@@ -5,24 +5,33 @@ const int pingPin = 7;
 int index =0;
 
 const int len=8;
-int datastring[4] = {0,1,1,0};
-int hammingstring[8] = {0};
-const float encodingMatrix[4][8] =
+int datastring[4] = {0,0,1,0};
+int hammingstring[8] = {0,0,0,0,0,0,0,0};
+const int encodingMatrix[4][8] =
   {
     {1,1,1,0,0,0,0,0},
-    {0,0,0,1,1,0,0,0},
-    {1,1,0,1,0,1,0,0},
-    {0,1,0,1,0,1,1,0}
-  }
+    {1,0,0,1,1,0,0,0},
+    {0,1,0,1,0,1,0,0},
+    {1,1,0,1,0,0,1,0}
+  };
 
 void dataToHamming(){
-  Matrix.Multiply((float *)datastring, (float *) encodingMatrix,1,4,8,(float *) hammingstring);
+  Matrix.Multiply((int *)datastring, (int *) encodingMatrix,1,4,8,(int *) hammingstring);
+  for(int i=0;i<len;i++){
+    hammingstring[i]=hammingstring[i]%2;
+  }
 }
 void setup() {
   Serial.begin(9600);
-    Timer1.initialize(500000);         // initialize timer1, and set a 1/2 second period
+    Timer1.initialize(250000/2);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(increment);
   dataToHamming();
+  for(int i=0;i<len;i++){
+            Matrix.Print((int*)hammingstring,len,1,"v");
+            
+
+  }
+  
   
 }
 
