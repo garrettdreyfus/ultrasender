@@ -23,13 +23,11 @@ void dataToHamming(){
 }
 void setup() {
   Serial.begin(9600);
-    Timer1.initialize(250000/2);         // initialize timer1, and set a 1/2 second period
+    Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(increment);
   dataToHamming();
   for(int i=0;i<len;i++){
             Matrix.Print((int*)hammingstring,len,1,"v");
-            
-
   }
   
   

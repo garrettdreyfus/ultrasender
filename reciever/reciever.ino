@@ -26,7 +26,7 @@ const int checkMatrix[8][3] =
 void setup() {
   
   Serial.begin(9600);
-    Timer1.initialize(125000/2);         // initialize timer1, and set a 1/2 second period
+    Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
   Timer1.attachInterrupt(recAndStore);
 }
 const int len=8;
@@ -53,7 +53,7 @@ void loop()
   }
   if(i==0 && flip){
     hammingCorrect();
-    Matrix.Multiply((int *)bytestring, (int *) decodingMatrix,1,4,8,(int *)finalstring);
+    Matrix.Multiply((int *)bytestring, (int *) decodingMatrix,1,8,4,(int *)finalstring);
     for(int i=0;i<4;i++){
       Serial.print(finalstring[i]);
     }
@@ -75,7 +75,7 @@ int counter = 0;
 int sum =0;
 void recAndStore(){
   sum += rec();
-  if(counter ==4){
+  if(counter ==1){
     if(sum>0){
       bytestring[i] = true;
     }
