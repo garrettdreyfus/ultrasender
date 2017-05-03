@@ -38,7 +38,7 @@ int finalstring[4];
 int checkstring[3];
 int datastring[4] = {0,0,1,0};
 int hammingstring[8] = {0,0,0,0,0,0,0,0};
-int chirpTime=0;
+unsigned long chirpTime=0;
 int state=0;
 int i = 0;
 #define RESTING  0
@@ -99,9 +99,26 @@ void setup() {
   dataToHamming();
 }
 void loop() {
+  Serial.println((long)(millis()-chirpTime));
+   if((long)(millis()-chirpTime)>0){
+      Serial.println("gonna start some shit");
+      while(rec()!=1){
+        delay(50);
+          chirp(true);
+          delay(50);
+      }
+      Serial.println("boi I heard that chirp");
+      Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
+      Timer1.attachInterrupt(increment);
+      while(true){
+        if(hammingstring[index] == 1){
+          chirp();
+        }
+      }
+  }
   if(rec()==1){
     delay(500);
-    chirp(true);
+    chirp();
     delay(500);
     Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
     Timer1.attachInterrupt(recAndStore);
@@ -120,22 +137,7 @@ void loop() {
       }
     }
   }
-  if(digitalRead(2)==HIGH){
-    int startTime = millis();
-    while(true){
-      if((millis()-startTime)%1000<500){
-        chirp(true);
-      }
-      else{
-        if(rec()==1){
-          break;
-        }
-      }
-    }
-    Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
-    Timer1.attachInterrupt(increment);
-  }
-  
+
 }
 
 void increment(){
