@@ -36,7 +36,7 @@ int index =0;
 int bytestring[len];
 int finalstring[4];
 int checkstring[3];
-int datastring[4] = {0,0,1,0};
+int datastring[4] = {1,0,1,0};
 int hammingstring[8] = {0,0,0,0,0,0,0,0};
 unsigned long chirpTime=0;
 int state=0;
@@ -78,7 +78,14 @@ int chirp(bool transmit){
     digitalWrite(pingPin, LOW);
 }
 int rec(){
-    chirp(false);
+    pinMode(transmitterPin,OUTPUT);
+    digitalWrite(2, LOW);
+    pinMode(pingPin, OUTPUT);
+    digitalWrite(pingPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(pingPin, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(pingPin, LOW);
     int duration;
     pinMode(pingPin, INPUT);
     duration = pulseIn(pingPin, HIGH);
@@ -91,35 +98,52 @@ int rec(){
 }
 
 void initializationPhase(){
-  chirpTime = random(0, 1000);
+  randomSeed(analogRead(0));
+  chirpTime = random(0, 10000);
+  Serial.println(chirpTime);
 }
 void setup() {
-  initializationPhase();
+  
   Serial.begin(9600);
+  initializationPhase();
+  pinMode(2, OUTPUT);
+  
   dataToHamming();
 }
+int reccount =0;
 void loop() {
-  Serial.println((long)(millis()-chirpTime));
+
    if((long)(millis()-chirpTime)>0){
-      Serial.println("gonna start some shit");
-      while(rec()!=1){
-        delay(50);
-          chirp(true);
-          delay(50);
+      Serial.println("gonna start transmission");
+      
+      while(((long)(millis()-chirpTime)<500)){
+        chirp(true);
       }
-      Serial.println("boi I heard that chirp");
+      Serial.println("done transmitting");
       Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
       Timer1.attachInterrupt(increment);
+      transmitting = true;
       while(true){
+        //Serial.println(index);
+        digitalWrite(2,HIGH);
         if(hammingstring[index] == 1){
           chirp();
         }
+        
       }
   }
-  if(rec()==1){
-    delay(500);
-    chirp();
-    delay(500);
+delay(5);
+   if(rec()==1){
+    reccount++;
+    
+   }
+   else{
+    reccount=0;
+   }
+   if(reccount >2){
+
+    Serial.println("heard a chirp ready to recieve");
+
     Timer1.initialize(250000);         // initialize timer1, and set a 1/2 second period
     Timer1.attachInterrupt(recAndStore);
     while(true){
